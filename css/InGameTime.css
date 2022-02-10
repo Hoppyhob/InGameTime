@@ -1,0 +1,16 @@
+.clock {
+    width: 96%;
+    margin: 1.5%;
+    text-align: center;
+    border: 2px solid black;
+    border-radius: 1%;
+}
+
+.clockrows{
+    display: flex;
+}
+
+.clockcols{
+    text-align: center;
+    flex: auto;
+}
