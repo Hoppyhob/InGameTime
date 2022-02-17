@@ -70,9 +70,10 @@ class InGameTimeMasterClock extends FormApplication{
     constructor(...args){
         super(...args)
         game.users.apps.push(this);
-        this.Time = new Date();
-        this.DisplayTime(); 
+        //this.Time = new Date();
+        //this.DisplayTime(); 
 
+        Hooks.on('renderApplication', (app, html, data)=>app===this?this.DisplayTime(html):null);
     }
     
     static get defaultOptions() {
@@ -104,67 +105,134 @@ class InGameTimeMasterClock extends FormApplication{
         this.element.find(".Add-Minute-five").click(() => this.AddMinutes(5));
         this.element.find(".Add-Minute").click(() => this.AddMinutes(1));
 
+        this.element.find(".Toggle-AM-PM").click(() => this.AddHours(12));
+        this.element.find(".Sub-Hour-Ten").click(() => this.SubHours(10));
+        this.element.find(".Sub-Hour-five").click(() => this.SubHours(5));
+        this.element.find(".Sub-Hour").click(() => this.SubHours(1));
+        this.element.find(".Sub-Minute-Ten-Three").click(() => this.SubMinutes(30));
+        this.element.find(".Sub-Minute-Ten").click(() => this.SubMinutes(10));
+        this.element.find(".Sub-Minute-five").click(() => this.SubMinutes(5));
+        this.element.find(".Sub-Minute").click(() => this.SubMinutes(1));
+
     }
 
     AddMinutes(mins){
-        if(mins && mins > 0){
-            var total = mins + this.Time.getMinutes();
-            this.Time.setMinutes(total % 60);
-            this.DisplayTime();
+        if(mins && mins > 0 ){
+            //var total = mins + this.Time.getMinutes();
+            var Time = game.settings.get("InGameTime", "Time");
+            if(Time){
+                var total = mins + Time.getMinutes();
+                Time.setMinutes(total % 60);
+                game.settings.set("InGameTime", "Time", Time).then(()=>(this.DisplayTime()));
+            }
         }
     }
 
     AddHours(Hours){
         if(Hours && Hours > 0){
-            var total = Hours + this.Time.getHours();
-            this.Time.setHours(total % 24);
-            this.DisplayTime();
+            //var total = Hours + this.Time.getHours();
+            var Time = game.settings.get("InGameTime", "Time");
+            if(Time){
+                var total = Hours + Time.getHours();
+                Time.setHours(total % 24);
+                game.settings.set("InGameTime", "Time", Time).then(()=>(this.DisplayTime()));
+            }
         }
     }
 
-    DisplayTime(){
-        let display = "";
-        let pm = false;
-        if(this.Time.getHours() >= 12){
-            if(this.Time.getHours() == 12){
-                display = display.concat(this.Time.getHours());
+    SubMinutes(mins){
+        if(mins && mins > 0){
+            var Time = game.settings.get("InGameTime", "Time");
+            if(Time){
+                var total = Time.getMinutes() - mins;
+                while(total < 0){
+                    total = total + 60;
+                }
+                Time.setMinutes(total);
+                game.settings.set("InGameTime", "Time", Time).then(()=>(this.DisplayTime()));
             }
-            else if(this.Time.getHours()-12 < 10){
-                display = display.concat("0",this.Time.getHours()-12);
-            }
-            else{
-                display = display.concat(this.Time.getHours()-12);
-            }
-            
-            pm = true;
         }
-        else if(this.Time.getHours() == 0){
-            display = display.concat("12");
-        }
-        else{
-            if(this.Time.getHours() < 10){
-                display = display.concat("0",this.Time.getHours());
-            }
-            else{
-                display = display.concat(this.Time.getHours());
-            }
-            
-        }
-        if(this.Time.getMinutes() < 10){
-            display = display.concat(":0", this.Time.getMinutes());
-        }
-        else{
-            display = display.concat(":", this.Time.getMinutes());
-        }
-        if(pm){
-            display = display.concat(" ", "PM");
-        }
-        else{
-            display = display.concat(" ", "AM");
-        }
-        
-        this.element.find(".time").text(display);
     }
+
+    SubHours(Hours){
+        if(Hours && Hours > 0){
+            var Time = game.settings.get("InGameTime", "Time");
+            if(Time){
+                var total = Time.getHours() - Hours;
+                while(total < 0){
+                    total = total + 24;
+                }
+                Time.setHours(total);
+                game.settings.set("InGameTime", "Time", Time).then(()=>(this.DisplayTime()));
+            }
+        }
+    }
+
+    DisplayTime(render){
+        var Time = game.settings.get("InGameTime", "Time");
+            if(Time){
+                let display = "";
+                let pm = false;
+                if(Time.getHours() >= 12){
+                    if(Time.getHours() == 12){
+                        display = display.concat(Time.getHours());
+                    }
+                    else if(Time.getHours()-12 < 10){
+                        display = display.concat("0",Time.getHours()-12);
+                    }
+                    else{
+                        display = display.concat(Time.getHours()-12);
+                    }
+                    
+                    pm = true;
+                }
+                else if(Time.getHours() == 0){
+                    display = display.concat("12");
+                }
+                else{
+                    if(Time.getHours() < 10){
+                        display = display.concat("0",Time.getHours());
+                    }
+                    else{
+                        display = display.concat(Time.getHours());
+                    }
+                    
+                }
+                if(Time.getMinutes() < 10){
+                    display = display.concat(":0", Time.getMinutes());
+                }
+                else{
+                    display = display.concat(":", Time.getMinutes());
+                }
+                if(pm){
+                    display = display.concat(" ", "PM");
+                }
+                else{
+                    display = display.concat(" ", "AM");
+                }
+                
+                if(render){
+                    render.find(".time").text(display);
+                }
+                else{
+                    this.element.find(".time").text(display);   
+                }
+        }
+    }
+
+    async _updateObject(event, formData) {}
 }
 
 Hooks.on('getSceneControlButtons', InGameTime.insertSceneControlButton);
+Hooks.once("init", () => {
+    game.settings.register("InGameTime", "Time", {
+        name: "Time",
+        scope: "world",
+        type: Date,
+        default: Date.now(),
+        onChange: value => {
+            
+        }
+    });
+});
+//Hooks.on('renderApplication', (app, html, data) => typeof app === 'InGameTimeMasterClock'?app.DisplayTime:null);
