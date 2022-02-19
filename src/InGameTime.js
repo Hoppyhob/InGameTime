@@ -35,7 +35,12 @@ class InGameTime{
 
    static ShowClock(){
        if(InGameTime.Clock === undefined)
+       if(game.user.isGM){
             InGameTime.Clock = new InGameTimeMasterClock();
+       }
+       else{
+        InGameTime.Clock = new InGameTimeClock();
+       }
         InGameTime.Clock.render(true);
    }
 }
@@ -44,25 +49,88 @@ class InGameTimeClock extends Application{
     constructor(...args){
         super(...args)
         game.users.apps.push(this);
-        this.Time = new Date();
+        //this.Time = new Date();
+        Hooks.on('renderApplication', (app, html, data)=>app===this?this.FirstRender(app, html, data):null);
 
+    }
+
+    FirstRender(app, html, data){
+        var Time = game.settings.get("InGameTime", "Time");
+        this.DisplayTime(Time, html);
+        game.socket.on('module.InGameTime', (value)=>this.DisplayTime(value));
     }
     
     static get defaultOptions() {
         const options = super.defaultOptions;
         options.title = "Clock";
         options.id = "InGameTime";
-        options.template = "modules/lmrtfy/templates/request-rolls.html";
+        options.template = "modules/InGameTime/templates/Clock.html";
         options.closeOnSubmit = false;
         options.popOut = true;
-        options.width = 600;
+        options.width = "auto";
         options.height = "auto";
         options.classes = ["InGameTime", "InGameTimeClock"];
+        options.resizable = true;
         return options;
     }
 
     render(force, context={}){
         return super.render(force, context);
+    }
+
+    DisplayTime(Time, render){
+        //var Time = game.settings.get("InGameTime", "Time");
+            if(typeof Time != "object"){
+                Time = new Date(Time);
+            }
+            if(Time){
+                let display = "";
+                let pm = false;
+                if(Time.getHours() >= 12){
+                    if(Time.getHours() == 12){
+                        display = display.concat(Time.getHours());
+                    }
+                    else if(Time.getHours()-12 < 10){
+                        display = display.concat("0",Time.getHours()-12);
+                    }
+                    else{
+                        display = display.concat(Time.getHours()-12);
+                    }
+                    
+                    pm = true;
+                }
+                else if(Time.getHours() == 0){
+                    display = display.concat("12");
+                }
+                else{
+                    if(Time.getHours() < 10){
+                        display = display.concat("0",Time.getHours());
+                    }
+                    else{
+                        display = display.concat(Time.getHours());
+                    }
+                    
+                }
+                if(Time.getMinutes() < 10){
+                    display = display.concat(":0", Time.getMinutes());
+                }
+                else{
+                    display = display.concat(":", Time.getMinutes());
+                }
+                if(pm){
+                    display = display.concat(" ", "PM");
+                }
+                else{
+                    display = display.concat(" ", "AM");
+                }
+                
+                if(render){
+                    render.find(".time").text(display);
+                }
+                else{
+                    this.element.find(".time").text(display);   
+                }
+        }
     }
 }
 
@@ -72,8 +140,14 @@ class InGameTimeMasterClock extends FormApplication{
         game.users.apps.push(this);
         //this.Time = new Date();
         //this.DisplayTime(); 
+        //game.socket.on('module.lmrtfy', LMRTFY.onMessage);
+        Hooks.on('renderApplication', (app, html, data)=>app===this?this.FirstRender(app, html, data):null);
+    }
 
-        Hooks.on('renderApplication', (app, html, data)=>app===this?this.DisplayTime(html):null);
+    FirstRender(app, html, data){
+            var Time = game.settings.get("InGameTime", "Time");
+            this.DisplayTime(Time, html);
+            game.socket.on('module.InGameTime', (value)=>this.DisplayTime(value));
     }
     
     static get defaultOptions() {
@@ -123,7 +197,7 @@ class InGameTimeMasterClock extends FormApplication{
             if(Time){
                 var total = mins + Time.getMinutes();
                 Time.setMinutes(total % 60);
-                game.settings.set("InGameTime", "Time", Time).then(()=>(this.DisplayTime()));
+                game.settings.set("InGameTime", "Time", Time)//.then(()=>(this.DisplayTime()));
             }
         }
     }
@@ -135,7 +209,7 @@ class InGameTimeMasterClock extends FormApplication{
             if(Time){
                 var total = Hours + Time.getHours();
                 Time.setHours(total % 24);
-                game.settings.set("InGameTime", "Time", Time).then(()=>(this.DisplayTime()));
+                game.settings.set("InGameTime", "Time", Time)//.then(()=>(this.DisplayTime()));
             }
         }
     }
@@ -149,7 +223,7 @@ class InGameTimeMasterClock extends FormApplication{
                     total = total + 60;
                 }
                 Time.setMinutes(total);
-                game.settings.set("InGameTime", "Time", Time).then(()=>(this.DisplayTime()));
+                game.settings.set("InGameTime", "Time", Time)//.then(()=>(this.DisplayTime()));
             }
         }
     }
@@ -163,13 +237,16 @@ class InGameTimeMasterClock extends FormApplication{
                     total = total + 24;
                 }
                 Time.setHours(total);
-                game.settings.set("InGameTime", "Time", Time).then(()=>(this.DisplayTime()));
+                game.settings.set("InGameTime", "Time", Time);//.then(()=>(this.DisplayTime()));
             }
         }
     }
 
-    DisplayTime(render){
-        var Time = game.settings.get("InGameTime", "Time");
+    DisplayTime(Time, render){
+        //var Time = game.settings.get("InGameTime", "Time");
+            if(typeof Time != "object"){
+                Time = new Date(Time);
+            }
             if(Time){
                 let display = "";
                 let pm = false;
@@ -231,8 +308,8 @@ Hooks.once("init", () => {
         type: Date,
         default: Date.now(),
         onChange: value => {
-            
+            game.socket.emit('module.InGameTime', value);
         }
     });
 });
-//Hooks.on('renderApplication', (app, html, data) => typeof app === 'InGameTimeMasterClock'?app.DisplayTime:null);
+//Hooks.on('ready', (app, html, data) => typeof app === 'InGameTimeMasterClock'?app.DisplayTime:null);
