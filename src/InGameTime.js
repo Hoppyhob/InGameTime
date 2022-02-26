@@ -86,36 +86,36 @@ class InGameTimeClock extends Application{
             if(Time){
                 let display = "";
                 let pm = false;
-                if(Time.getHours() >= 12){
-                    if(Time.getHours() == 12){
-                        display = display.concat(Time.getHours());
+                if(Time.getUTCHours() >= 12){
+                    if(Time.getUTCHours() == 12){
+                        display = display.concat(Time.getUTCHours());
                     }
-                    else if(Time.getHours()-12 < 10){
-                        display = display.concat("0",Time.getHours()-12);
+                    else if(Time.getUTCHours()-12 < 10){
+                        display = display.concat("0",Time.getUTCHours()-12);
                     }
                     else{
-                        display = display.concat(Time.getHours()-12);
+                        display = display.concat(Time.getUTCHours()-12);
                     }
                     
                     pm = true;
                 }
-                else if(Time.getHours() == 0){
+                else if(Time.getUTCHours() == 0){
                     display = display.concat("12");
                 }
                 else{
-                    if(Time.getHours() < 10){
-                        display = display.concat("0",Time.getHours());
+                    if(Time.getUTCHours() < 10){
+                        display = display.concat("0",Time.getUTCHours());
                     }
                     else{
-                        display = display.concat(Time.getHours());
+                        display = display.concat(Time.getUTCHours());
                     }
                     
                 }
-                if(Time.getMinutes() < 10){
-                    display = display.concat(":0", Time.getMinutes());
+                if(Time.getUTCMinutes() < 10){
+                    display = display.concat(":0", Time.getUTCMinutes());
                 }
                 else{
-                    display = display.concat(":", Time.getMinutes());
+                    display = display.concat(":", Time.getUTCMinutes());
                 }
                 if(pm){
                     display = display.concat(" ", "PM");
@@ -195,8 +195,8 @@ class InGameTimeMasterClock extends FormApplication{
             //var total = mins + this.Time.getMinutes();
             var Time = game.settings.get("InGameTime", "Time");
             if(Time){
-                var total = mins + Time.getMinutes();
-                Time.setMinutes(total % 60);
+                var total = mins + Time.getUTCMinutes();
+                Time.setUTCMinutes(total % 60);
                 game.settings.set("InGameTime", "Time", Time)//.then(()=>(this.DisplayTime()));
             }
         }
@@ -207,8 +207,8 @@ class InGameTimeMasterClock extends FormApplication{
             //var total = Hours + this.Time.getHours();
             var Time = game.settings.get("InGameTime", "Time");
             if(Time){
-                var total = Hours + Time.getHours();
-                Time.setHours(total % 24);
+                var total = Hours + Time.getUTCHours();
+                Time.setUTCHours(total % 24);
                 game.settings.set("InGameTime", "Time", Time)//.then(()=>(this.DisplayTime()));
             }
         }
@@ -218,11 +218,11 @@ class InGameTimeMasterClock extends FormApplication{
         if(mins && mins > 0){
             var Time = game.settings.get("InGameTime", "Time");
             if(Time){
-                var total = Time.getMinutes() - mins;
+                var total = Time.getUTCMinutes() - mins;
                 while(total < 0){
                     total = total + 60;
                 }
-                Time.setMinutes(total);
+                Time.setUTCMinutes(total);
                 game.settings.set("InGameTime", "Time", Time)//.then(()=>(this.DisplayTime()));
             }
         }
@@ -232,11 +232,11 @@ class InGameTimeMasterClock extends FormApplication{
         if(Hours && Hours > 0){
             var Time = game.settings.get("InGameTime", "Time");
             if(Time){
-                var total = Time.getHours() - Hours;
+                var total = Time.getUTCHours() - Hours;
                 while(total < 0){
                     total = total + 24;
                 }
-                Time.setHours(total);
+                Time.setUTCHours(total);
                 game.settings.set("InGameTime", "Time", Time);//.then(()=>(this.DisplayTime()));
             }
         }
@@ -250,36 +250,36 @@ class InGameTimeMasterClock extends FormApplication{
             if(Time){
                 let display = "";
                 let pm = false;
-                if(Time.getHours() >= 12){
-                    if(Time.getHours() == 12){
-                        display = display.concat(Time.getHours());
+                if(Time.getUTCHours() >= 12){
+                    if(Time.getUTCHours() == 12){
+                        display = display.concat(Time.getUTCHours());
                     }
-                    else if(Time.getHours()-12 < 10){
-                        display = display.concat("0",Time.getHours()-12);
+                    else if(Time.getUTCHours()-12 < 10){
+                        display = display.concat("0",Time.getUTCHours()-12);
                     }
                     else{
-                        display = display.concat(Time.getHours()-12);
+                        display = display.concat(Time.getUTCHours()-12);
                     }
                     
                     pm = true;
                 }
-                else if(Time.getHours() == 0){
+                else if(Time.getUTCHours() == 0){
                     display = display.concat("12");
                 }
                 else{
-                    if(Time.getHours() < 10){
-                        display = display.concat("0",Time.getHours());
+                    if(Time.getUTCHours() < 10){
+                        display = display.concat("0",Time.getUTCHours());
                     }
                     else{
-                        display = display.concat(Time.getHours());
+                        display = display.concat(Time.getUTCHours());
                     }
                     
                 }
-                if(Time.getMinutes() < 10){
-                    display = display.concat(":0", Time.getMinutes());
+                if(Time.getUTCMinutes() < 10){
+                    display = display.concat(":0", Time.getUTCMinutes());
                 }
                 else{
-                    display = display.concat(":", Time.getMinutes());
+                    display = display.concat(":", Time.getUTCMinutes());
                 }
                 if(pm){
                     display = display.concat(" ", "PM");
