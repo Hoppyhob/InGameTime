@@ -12,11 +12,7 @@
     ],
     "socket": true,
     "minimumCoreVersion": "0.8.5",
-    "compatibleCoreVersion": "0.9.0",
     "url": "https://github.com/Hoppyhob/InGameTime",
-    "manifest": "",
-    "download": "",
-    "license": "",
-    "readme": "",
-    "changelog": ""
+    "manifest": "https://github.com/Hoppyhob/InGameTime/releases/download/v1.0.0/module.json",
+    "download": "https://github.com/Hoppyhob/InGameTime/releases/download/v1.0.0/InGameTime.zip"
 }
