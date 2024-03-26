@@ -1,16 +1,48 @@
 .clock {
-    width: 96%;
-    margin: 1.5%;
-    text-align: center;
-    border: 2px solid black;
-    border-radius: 1%;
+  width: 96%;
+  margin: 1.5%;
+  text-align: center;
+  border: 2px solid black;
+  border-radius: 1%;
+  position: relative;
+  container-type: inline-size;
 }
-
-.clockrows{
-    display: flex;
+.clock .time {
+  font-weight: bold;
+  font-size: 20cqw;
 }
-
-.clockcols{
-    text-align: center;
-    flex: auto;
+.LightLevel {
+  width: 96%;
+  margin: 1.5%;
+  text-align: center;
+  border: 2px solid black;
+  border-radius: 1%;
+  position: relative;
+  border-radius: 25px;
+  container-type: inline-size;
+}
+.LightLevel .Light {
+  font-size: 5cqw;
+}
+.LightLevel.Dim {
+  background: #C8C6D7;
+  color: black;
+  font-weight: bold;
+}
+.LightLevel.Darkness {
+  background: #150534;
+  color: white;
+  font-weight: bold;
+}
+.LightLevel.Bright {
+  background: #E8D07F;
+  color: black;
+  font-weight: bold;
+}
+.clockrows {
+  display: flex;
+}
+.clockcols {
+  text-align: center;
+  flex: auto;
 }
